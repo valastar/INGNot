@@ -1,0 +1,57 @@
+.tiptap h3 { font-size: 1.25rem; font-weight: 600; margin: 1em 0 0.3em; }
+.tiptap h1, .tiptap h2, .tiptap h3 { scroll-margin-top: 9rem; }
+
+.mate { display: inline-block; cursor: pointer; padding: 0 0.15em; border-radius: 0.3rem; }
+.mate:hover, .mate.ProseMirror-selectednode { background: var(--surface-hover); }
+.mate-bloque { display: block; text-align: center; margin: 0.6em 0; }
+.mate input { background: var(--bg); border: 1px solid var(--accent); border-radius: 0.375rem; padding: 0.1rem 0.4rem; font-family: ui-monospace, monospace; color: var(--text); outline: none; }
+
+.bloque-nodo { border: 1px solid var(--border); background: var(--surface); border-radius: 0.75rem; padding: 0.75rem; margin: 0.75em 0; }
+.bloque-nodo.ProseMirror-selectednode { outline: 2px solid var(--accent); }
+
+.plegable { border-left: 2px solid var(--border); margin: 0.6em 0; padding-left: 1.6rem; position: relative; }
+.plegable-btn { position: absolute; left: 0.25rem; top: 0.3rem; color: var(--accent); cursor: pointer; background: none; border: none; font-size: 1rem; line-height: 1.7; }
+.plegable-content > :first-child { font-weight: 600; margin-top: 0.3em; }
+.plegable[data-abierto="false"] .plegable-content > :not(:first-child) { display: none; }
+
+/* ── Bloques movibles / redimensionables ── */
+.flot { position: relative; box-sizing: border-box; }
+.flot-centro { clear: both; margin: 0.75em auto; }
+.flot-izq { float: left; margin: 0.25em 1rem 0.5em 0; max-width: 70%; }
+.flot-der { float: right; margin: 0.25em 0 0.5em 1rem; max-width: 70%; }
+.tiptap::after { content: ""; display: block; clear: both; }
+
+.flot-barra {
+  position: absolute; bottom: 100%; left: 0; z-index: 20; display: none; align-items: center; gap: 0.125rem;
+  padding: 0.2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 0.5rem; white-space: nowrap;
+}
+.flot-der .flot-barra { left: auto; right: 0; }
+.flot:hover .flot-barra, .flot.ProseMirror-selectednode .flot-barra { display: flex; }
+.flot-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem 0.4rem; border-radius: 0.375rem; color: var(--muted); }
+.flot-btn:hover { color: var(--text); background: var(--surface-hover); }
+.flot-btn.activo { color: var(--accent); }
+.flot-sep { width: 1px; align-self: stretch; margin: 0 0.15rem; background: var(--border); }
+
+.flot-resize { position: absolute; bottom: 3px; width: 14px; height: 14px; border-radius: 4px; background: var(--accent); opacity: 0; z-index: 5; }
+.flot-resize.izq { right: 3px; cursor: nwse-resize; }
+.flot-resize.der { left: 3px; cursor: nesw-resize; }
+.flot:hover .flot-resize, .flot.ProseMirror-selectednode .flot-resize { opacity: 0.9; }
+
+/* ── Campo de fórmulas (MathLive) ── */
+math-field {
+  display: block;
+  width: 100%;
+  min-height: 2.4rem;
+  padding: 0.15rem 0.6rem;
+  font-size: 1.15rem;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  --caret-color: var(--accent);
+  --selection-background-color: rgba(217, 119, 87, 0.35);
+  --placeholder-color: var(--accent);
+}
+math-field:focus-within { border-color: var(--accent); outline: none; }
+math-field::part(menu-toggle),
+math-field::part(virtual-keyboard-toggle) { display: none; }
