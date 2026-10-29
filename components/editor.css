@@ -55,3 +55,6 @@ math-field {
 math-field:focus-within { border-color: var(--accent); outline: none; }
 math-field::part(menu-toggle),
 math-field::part(virtual-keyboard-toggle) { display: none; }
+
+.flot .llave { margin: 0; }
+.flot .tableWrapper > table { margin: 0; }

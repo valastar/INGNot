@@ -111,7 +111,7 @@ export function Flotante({ p, children, extra, conAlto, tarjeta }: Props) {
       if (d.target >= from && d.target <= from + actual.nodeSize) tr.setNodeMarkup(from, undefined, attrs);
       else {
         tr.delete(from, from + actual.nodeSize);
-        tr.insert(tr.mapping.map(d.target), actual.type.create(attrs));
+        tr.insert(tr.mapping.map(d.target), actual.type.create(attrs, actual.content, actual.marks));
       }
       editor.view.dispatch(tr);
     };

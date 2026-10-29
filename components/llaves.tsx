@@ -1,8 +1,9 @@
 "use client";
-import { Node, mergeAttributes, ReactNodeViewRenderer, NodeViewWrapper, NodeViewContent } from "@tiptap/react";
+import { Node, mergeAttributes, ReactNodeViewRenderer, NodeViewWrapper, NodeViewContent, type NodeViewProps } from "@tiptap/react";
 import { Fragment } from "@tiptap/pm/model";
 import { TextSelection, type EditorState, type Transaction } from "@tiptap/pm/state";
-
+import { X } from "lucide-react";
+import { Flotante, atributosFlotante } from "./bloque";
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     llave: { toggleLlave: () => ReturnType };
@@ -10,6 +11,30 @@ declare module "@tiptap/core" {
 }
 
 const stroke = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" as const };
+
+function VistaLlave(p: NodeViewProps) {
+  return (
+    <Flotante
+      p={p}
+      extra={
+        <button
+          type="button"
+          title="Quitar llave (conserva el contenido)"
+          className="flot-btn hover:!text-red-400"
+          onClick={() => {
+            const pos = p.getPos();
+            if (typeof pos !== "number") return;
+            p.editor.chain().focus().setTextSelection(pos + 2).toggleLlave().run();
+          }}
+        >
+          <X size={14} />
+        </button>
+      }
+    >
+      <NodeViewContent className="llave" />
+    </Flotante>
+  );
+}
 
 function BodyView() {
   return (
@@ -81,6 +106,10 @@ export const Llave = Node.create({
   content: "llaveLabel llaveBody",
   defining: true,
   priority: 1000,
+    addAttributes() {
+    return { ...atributosFlotante };
+  },
+  addNodeView() { return ReactNodeViewRenderer(VistaLlave); },
 
   parseHTML() { return [{ tag: "div[data-llave-box]" }]; },
   renderHTML({ HTMLAttributes }) {
