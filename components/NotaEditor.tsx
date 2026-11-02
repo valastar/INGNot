@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   useEditor,
@@ -337,6 +337,7 @@ function comprimir(file: File, max = 1000): Promise<string> {
     img.src = url;
   });
 }
+type Estado = "guardado" | "guardando" | "error";
 
 export default function NotaEditor({ scope, notaId, backHref }: Props) {
   const { notas, ready, actualizar } = useNotas(scope);
@@ -369,7 +370,7 @@ function Editor({
 }: {
   nota: Nota;
   backHref: string;
-  onChange: (c: Cambios) => void;
+  onChange: (c: Cambios) => Promise<boolean>;
 }) {
   const [titulo, setTitulo] = useState(nota.titulo);
   const [etiquetas, setEtiquetas] = useState<string[]>(nota.etiquetas);
@@ -384,9 +385,15 @@ function Editor({
   const [indice, setIndice] = useState<Item[]>([]);
   const [slash, setSlashS] = useState<string | null>(null);
   const [idx, setIdxS] = useState(0);
+  const [estado, setEstado] = useState<Estado>("guardado");
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendiente = useRef<Cambios>({});
+  const enVuelo = useRef(0);
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  });
   const fileInput = useRef<HTMLInputElement>(null);
   const inputFoto = useRef<HTMLInputElement>(null);
   const editorRef = useRef<TipTapEditor | null>(null);
@@ -404,15 +411,63 @@ function Editor({
     setIdxS(n);
   };
 
+  // Envía ya lo pendiente (sin esperar los 400 ms). Si falla, lo vuelve a encolar.
+  const vaciar = async () => {
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+    const c = pendiente.current;
+    if (!Object.keys(c).length) return;
+    pendiente.current = {};
+    enVuelo.current++;
+    setEstado("guardando");
+    let ok = false;
+    try {
+      ok = await onChangeRef.current(c);
+    } catch {}
+    enVuelo.current--;
+    if (!ok) {
+      pendiente.current = { ...c, ...pendiente.current }; // lo más nuevo gana
+      setEstado("error");
+    } else if (enVuelo.current === 0 && !Object.keys(pendiente.current).length) {
+      setEstado("guardado");
+    }
+  };
+
   // Acumula cambios para que título, contenido y etiquetas no se pisen entre sí
   const guardarConRetraso = (c: Cambios) => {
     pendiente.current = { ...pendiente.current, ...c };
+    setEstado("guardando");
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => {
-      onChange(pendiente.current);
-      pendiente.current = {};
-    }, 400);
+    timer.current = setTimeout(vaciar, 400);
   };
+
+  // Vaciar al desmontar (navegar) y al ocultar/cerrar la pestaña
+  useEffect(() => {
+    const oculto = () => {
+      if (document.visibilityState === "hidden") void vaciar();
+    };
+    const salir = () => {
+      void vaciar();
+    };
+    const antes = (e: BeforeUnloadEvent) => {
+      if (timer.current || enVuelo.current || Object.keys(pendiente.current).length) {
+        void vaciar();
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    document.addEventListener("visibilitychange", oculto);
+    window.addEventListener("pagehide", salir);
+    window.addEventListener("beforeunload", antes);
+    return () => {
+      document.removeEventListener("visibilitychange", oculto);
+      window.removeEventListener("pagehide", salir);
+      window.removeEventListener("beforeunload", antes);
+      void vaciar();
+    };
+  }, []);
 
   const avisar = (t: string) => {
     setAviso(t);
@@ -646,12 +701,31 @@ function Editor({
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <Link
-        href={backHref}
-        className="inline-flex items-center gap-1 text-sm text-[var(--muted)] hover:text-[var(--text)]"
-      >
-        <ArrowLeft size={16} /> Notas
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          href={backHref}
+          className="inline-flex items-center gap-1 text-sm text-[var(--muted)] hover:text-[var(--text)]"
+        >
+          <ArrowLeft size={16} /> Notas
+        </Link>
+        <span aria-live="polite" className="text-xs">
+          {estado === "guardando" && (
+            <span className="text-[var(--muted)]">Guardando…</span>
+          )}
+          {estado === "guardado" && (
+            <span className="text-[var(--muted)]">Guardado ✓</span>
+          )}
+          {estado === "error" && (
+            <button
+              type="button"
+              onClick={() => void vaciar()}
+              className="text-red-400 hover:underline"
+            >
+              No se guardó · Reintentar
+            </button>
+          )}
+        </span>
+      </div>
 
       <input
         value={titulo}

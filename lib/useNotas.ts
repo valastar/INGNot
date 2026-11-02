@@ -12,7 +12,9 @@ export type Nota = {
 };
 
 const COLS = "id,titulo,contenido,actualizada,etiquetas,fijada";
-type Cambios = Partial<Pick<Nota, "titulo" | "contenido" | "etiquetas" | "fijada">>;
+type Cambios = Partial<
+  Pick<Nota, "titulo" | "contenido" | "etiquetas" | "fijada">
+>;
 
 export function useNotas(scope: string) {
   const claseId = scope === "rapidas" ? null : scope;
@@ -23,21 +25,46 @@ export function useNotas(scope: string) {
     let q = supabase.from("notas").select(COLS);
     q = claseId ? q.eq("clase_id", claseId) : q.is("clase_id", null);
     q.order("actualizada", { ascending: false }).then(({ data, error }) => {
-      if (error) console.error("notas:", error.message, "(¿ejecutaste supabase/notas-v2.sql?)");
-      setNotas(((data as Nota[]) ?? []).map((n) => ({ ...n, etiquetas: n.etiquetas ?? [], fijada: !!n.fijada })));
+      if (error)
+        console.error(
+          "notas:",
+          error.message,
+          "(¿ejecutaste supabase/notas-v2.sql?)",
+        );
+      setNotas(
+        ((data as Nota[]) ?? []).map((n) => ({
+          ...n,
+          etiquetas: n.etiquetas ?? [],
+          fijada: !!n.fijada,
+        })),
+      );
       setReady(true);
     });
   }, [claseId]);
 
   const crear = async (): Promise<string | null> => {
-    const { data } = await supabase.from("notas").insert({ clase_id: claseId }).select("id").single();
+    const { data } = await supabase
+      .from("notas")
+      .insert({ clase_id: claseId })
+      .select("id")
+      .single();
     return data?.id ?? null;
   };
 
-  const actualizar = async (id: string, cambios: Cambios) => {
+  const actualizar = async (id: string, cambios: Cambios): Promise<boolean> => {
     const actualizada = new Date().toISOString();
-    await supabase.from("notas").update({ ...cambios, actualizada }).eq("id", id);
-    setNotas((lista) => lista.map((n) => (n.id === id ? { ...n, ...cambios, actualizada } : n)));
+    const { error } = await supabase
+      .from("notas")
+      .update({ ...cambios, actualizada })
+      .eq("id", id);
+    if (error) {
+      console.error("guardar nota:", error.message);
+      return false;
+    }
+    setNotas((lista) =>
+      lista.map((n) => (n.id === id ? { ...n, ...cambios, actualizada } : n)),
+    );
+    return true;
   };
 
   const borrar = async (id: string) => {
