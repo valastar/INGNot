@@ -58,3 +58,26 @@ math-field::part(virtual-keyboard-toggle) { display: none; }
 
 .flot .llave { margin: 0; }
 .flot .tableWrapper > table { margin: 0; }
+
+/* ── Canvas libre: los bloques se posicionan dentro de la nota ── */
+.tiptap { position: relative; }
+.tiptap .flot-libre {
+  position: absolute;
+  float: none;
+  clear: none;
+  margin: 0;
+  max-width: 100%;
+  z-index: 5;
+}
+.tiptap .flot-libre .flot-barra { left: 0; right: auto; }
+
+/* Espaciador del reflujo: el texto solo lo rodea a partir de --rf-mt (donde empieza el bloque) */
+.tiptap::before {
+  content: "";
+  display: block;
+  float: var(--rf-side, none);
+  width: var(--rf-w, 0);
+  height: var(--rf-h, 0);
+  shape-outside: inset(var(--rf-mt, 0px) 0 0 0);
+  pointer-events: none;
+}
