@@ -4,7 +4,7 @@ export default function NameGate({ onLogin }: { onLogin: () => void }) {
   return (
     <main className="min-h-screen grid place-items-center px-6">
       <div className="w-full max-w-sm text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">My Note</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">INGNot</h1>
         <p className="mt-2 text-[var(--muted)]">Inicia sesión para continuar</p>
         <button
           onClick={onLogin}

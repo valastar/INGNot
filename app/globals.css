@@ -1,21 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #1f1e1d;
-  --surface: #2a2927;
-  --surface-hover: #33312f;
-  --border: #3b3936;
-  --text: #ece9e2;
-  --muted: #9a958c;
-  --accent: #d97757;
+  --bg: #18181B;
+  --surface: #27272A;
+  --surface-hover: #3F3F46;
+  --border: #3F3F46;
+  --text: #FAFAFA;
+  --muted: #A1A1AA;
+  --accent: #1679a3;
+  --link: #4a63de;
+  --accent-2: #227cc5;
+  color-scheme: dark;
+}
+
+
+/* Hoja de escritura: mismas variables, valores claros */
+.paper {
+  --bg: #FAFAFA;
+  --surface: #FFFFFF;
+  --surface-hover: #F4F4F5;
+  --border: #E4E4E7;
+  --text: #18181B;
+  --muted: #71717A;
+  --accent: #7C3AED;
+  --link: #7C3AED;
+  background: #FAFAFA;
+  color: var(--text);
+  color-scheme: light;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+::selection { background: rgba(124, 58, 237, 0.35); }
+:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline: none; }
 
 .tiptap { outline: none; min-height: 50vh; line-height: 1.7; caret-color: var(--accent); }
 .tiptap p { margin: 0.5em 0; }
@@ -51,7 +74,7 @@ body {
 .tiptap th, .tiptap td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; min-width: 80px; vertical-align: top; position: relative; }
 .tiptap th { background: var(--surface); font-weight: 600; text-align: left; }
 .tiptap td > p, .tiptap th > p { margin: 0; }
-.tiptap .selectedCell::after { content: ""; position: absolute; inset: 0; background: rgba(217, 119, 87, 0.18); pointer-events: none; }
+.tiptap .selectedCell::after { content: ""; position: absolute; inset: 0; background: rgba(124, 58, 237, 0.15); pointer-events: none; }
 .tiptap .column-resize-handle { position: absolute; right: -2px; top: 0; bottom: 0; width: 4px; background: var(--accent); pointer-events: none; }
 .tiptap.resize-cursor { cursor: col-resize; }
 .tableWrapper { overflow-x: auto; }

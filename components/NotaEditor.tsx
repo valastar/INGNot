@@ -430,7 +430,10 @@ function Editor({
     if (!ok) {
       pendiente.current = { ...c, ...pendiente.current }; // lo más nuevo gana
       setEstado("error");
-    } else if (enVuelo.current === 0 && !Object.keys(pendiente.current).length) {
+    } else if (
+      enVuelo.current === 0 &&
+      !Object.keys(pendiente.current).length
+    ) {
       setEstado("guardado");
     }
   };
@@ -452,7 +455,11 @@ function Editor({
       void vaciar();
     };
     const antes = (e: BeforeUnloadEvent) => {
-      if (timer.current || enVuelo.current || Object.keys(pendiente.current).length) {
+      if (
+        timer.current ||
+        enVuelo.current ||
+        Object.keys(pendiente.current).length
+      ) {
         void vaciar();
         e.preventDefault();
         e.returnValue = "";
@@ -788,7 +795,7 @@ function Editor({
 
       {editor && (
         <div className="sticky top-0 z-10 mt-4 bg-[var(--bg)] pb-2">
-          <div className="flex flex-wrap gap-1 border-b border-[var(--border)] pb-2">
+          <div className="flex flex-wrap items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-1.5">
             {tool(
               editor.isActive("bold"),
               (e) => e.chain().focus().toggleBold().run(),
@@ -1168,7 +1175,7 @@ function Editor({
         </aside>
       )}
 
-      <div className="mt-6">
+      <div className="flex flex-wrap items-center gap-1 rounded-md border border-[var(--border)] bg-[var(--surface)] p-1">
         <EditorContent editor={editor} />
       </div>
     </main>

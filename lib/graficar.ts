@@ -20,6 +20,11 @@ export async function dibujarGrafica(
   const g = c.getContext("2d")!;
   g.scale(dpr, dpr);
   g.clearRect(0, 0, W, H);
+  const css = getComputedStyle(c);
+  const v = (n: string, f: string) => css.getPropertyValue(n).trim() || f;
+  const cGrid = v("--border", "#334155"),
+    cLabel = v("--muted", "#94A3B8"),
+    cAxis = v("--text", "#F8FAFC");
 
   const compiladas = fns.map((f) => {
     if (!f.trim()) return null;
